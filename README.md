@@ -1,40 +1,35 @@
-# Todo API — Phase 1
+# Todo API
 
-Express + better-sqlite3, verified end-to-end (CRUD, validation, 404s, CORS).
+Express 5 + [Turso](https://turso.tech) (libSQL). Requires Node 22+.
 
 ## Getting started
 
     npm install
-    cp .env.example .env
+    cp .env.example .env     # then fill in your Turso URL and token
     npm run dev
 
-Server runs at http://localhost:3001. The SQLite file is created automatically at
-`./data/todos.db` on first run (both the file and its parent directory).
+Server runs at http://localhost:3001 and creates the `todos` table on first start.
+No Turso account? Set `TURSO_DATABASE_URL=file:todos.db` in `.env` to use a local
+SQLite file instead.
 
 ## Routes
 
-| Method | Path         | Body               | Notes                          |
-|--------|--------------|--------------------|----------------------------------|
-| GET    | /todos       | —                  | all todos, newest first        |
-| POST   | /todos       | `{ "text": "..." }`| 400 if text is empty/whitespace |
-| PATCH  | /todos/:id   | —                  | toggles `completed`, 404 if missing |
-| DELETE | /todos/:id   | —                  | 204 on success, 404 if missing  |
-| GET    | /health      | —                  | liveness check                 |
+| Method | Path         | Body               | Notes                                  |
+|--------|--------------|--------------------|----------------------------------------|
+| GET    | /todos       | —                  | all todos, newest first                |
+| POST   | /todos       | `{ "text": "..." }`| 400 if text is empty or over 500 chars |
+| PATCH  | /todos/:id   | —                  | toggles `completed`, 404 if missing    |
+| DELETE | /todos/:id   | —                  | 204 on success, 404 if missing         |
+| GET    | /health      | —                  | liveness check                         |
+
+Errors are always JSON: `{ "error": "..." }`.
 
 ## Structure
 
     src/
-      db/
-        sqliteDriver.js  — local dev: better-sqlite3 against a file, WAL mode
-        tursoDriver.js   — production: libSQL client, same interface
-        index.js         — picks a driver based on whether TURSO_DATABASE_URL is set
-      routes/
-        todos.js         — the four CRUD routes, driver-agnostic (always awaits)
-      server.js          — Express app, CORS, JSON error handler, mounts the router
-
-Both drivers expose the same five methods (`getAll`, `getById`, `insert`,
-`toggleCompleted`, `remove`), so `routes/todos.js` never needs to know or care which
-one is active.
+      db.js            — Turso/libSQL client and the four todo queries
+      routes/todos.js  — the CRUD routes and input validation
+      server.js        — Express app, CORS, JSON 404 and error handlers
 
 ## Deploy
 

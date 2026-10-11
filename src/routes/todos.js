@@ -1,13 +1,12 @@
 import { Router } from "express";
-import db from "../db/index.js";
+import { getAllTodos, createTodo, toggleTodo, deleteTodo } from "../db.js";
 
 const router = Router();
 
 const MAX_TEXT_LENGTH = 500;
 
 router.get("/", async (req, res) => {
-    const todos = await db.getAll();
-    res.json(todos);
+    res.json(await getAllTodos());
 });
 
 router.post("/", async (req, res) => {
@@ -24,31 +23,26 @@ router.post("/", async (req, res) => {
             .json({ error: `text must be at most ${MAX_TEXT_LENGTH} characters` });
     }
 
-    const created = await db.insert(text);
-    res.status(201).json(created);
+    res.status(201).json(await createTodo(text));
 });
 
 router.patch("/:id", async (req, res) => {
-    const { id } = req.params;
-    const existing = await db.getById(id);
+    const updated = await toggleTodo(req.params.id);
 
-    if (!existing) {
+    if (!updated) {
         return res.status(404).json({ error: "todo not found" });
     }
 
-    const updated = await db.toggleCompleted(id);
     res.json(updated);
 });
 
 router.delete("/:id", async (req, res) => {
-    const { id } = req.params;
-    const existing = await db.getById(id);
+    const deleted = await deleteTodo(req.params.id);
 
-    if (!existing) {
+    if (!deleted) {
         return res.status(404).json({ error: "todo not found" });
     }
 
-    await db.remove(id);
     res.status(204).send();
 });
 
