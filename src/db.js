@@ -12,45 +12,59 @@ const client = createClient({
     authToken: process.env.TURSO_AUTH_TOKEN
 });
 
-await client.execute(`
-    CREATE TABLE IF NOT EXISTS todos (
+// Every todo belongs to a list. There's no separate lists table: a list is just
+// the set of todos that share a list_id.
+await client.batch([
+    `CREATE TABLE IF NOT EXISTS todos (
         id INTEGER PRIMARY KEY AUTOINCREMENT,
+        list_id TEXT NOT NULL,
         text TEXT NOT NULL,
         completed INTEGER NOT NULL DEFAULT 0,
         created_at TEXT NOT NULL DEFAULT (datetime('now'))
-    )
-`);
+    )`,
+    "CREATE INDEX IF NOT EXISTS todos_list_id ON todos (list_id)"
+]);
 
 // `RETURNING *` hands back the affected row, so each write is a single query.
-// Functions that target an id return null (or false) when no such todo exists.
+// Every query filters on list_id, so a todo can only be reached through its own list.
 
-export async function getAllTodos() {
-    const result = await client.execute(
-        "SELECT * FROM todos ORDER BY id DESC"
-    );
+export async function getTodos(listId) {
+    const result = await client.execute({
+        sql: "SELECT * FROM todos WHERE list_id = ? ORDER BY id DESC",
+        args: [listId]
+    });
     return result.rows;
 }
 
-export async function createTodo(text) {
+export async function countTodos(listId) {
     const result = await client.execute({
-        sql: "INSERT INTO todos (text) VALUES (?) RETURNING *",
-        args: [text]
+        sql: "SELECT COUNT(*) AS count FROM todos WHERE list_id = ?",
+        args: [listId]
+    });
+    return Number(result.rows[0].count);
+}
+
+export async function createTodo(listId, text) {
+    const result = await client.execute({
+        sql: "INSERT INTO todos (list_id, text) VALUES (?, ?) RETURNING *",
+        args: [listId, text]
     });
     return result.rows[0];
 }
 
-export async function toggleTodo(id) {
+export async function toggleTodo(listId, id) {
     const result = await client.execute({
-        sql: "UPDATE todos SET completed = NOT completed WHERE id = ? RETURNING *",
-        args: [id]
+        sql: `UPDATE todos SET completed = NOT completed
+              WHERE id = ? AND list_id = ? RETURNING *`,
+        args: [id, listId]
     });
     return result.rows[0] ?? null;
 }
 
-export async function deleteTodo(id) {
+export async function deleteTodo(listId, id) {
     const result = await client.execute({
-        sql: "DELETE FROM todos WHERE id = ?",
-        args: [id]
+        sql: "DELETE FROM todos WHERE id = ? AND list_id = ?",
+        args: [id, listId]
     });
     return result.rowsAffected > 0;
 }

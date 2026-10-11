@@ -1,11 +1,17 @@
 import express from "express";
 import cors from "cors";
+import { rateLimit } from "express-rate-limit";
 import todosRouter from "./routes/todos.js";
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
 app.disable("x-powered-by");
+
+// Render sits in front of the app as a proxy. Trusting it makes req.ip the real
+// visitor's address instead of the proxy's, which the rate limiter relies on.
+app.set("trust proxy", 1);
+
 app.use(cors({ origin: process.env.CORS_ORIGIN || "http://localhost:5173" }));
 app.use(express.json({ limit: "10kb" }));
 
@@ -13,7 +19,16 @@ app.get("/health", (req, res) => {
     res.json({ status: "ok" });
 });
 
-app.use("/todos", todosRouter);
+// The API is public, so cap how fast any one visitor can call it.
+app.use(
+    rateLimit({
+        windowMs: 60 * 1000,
+        limit: 60,
+        message: { error: "too many requests, please slow down" }
+    })
+);
+
+app.use("/lists/:listId/todos", todosRouter);
 
 // Unmatched routes would otherwise get Express's default HTML 404 page.
 app.use((req, res) => {

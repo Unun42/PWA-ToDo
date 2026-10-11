@@ -12,24 +12,34 @@ Server runs at http://localhost:3001 and creates the `todos` table on first star
 No Turso account? Set `TURSO_DATABASE_URL=file:todos.db` in `.env` to use a local
 SQLite file instead.
 
+## Lists
+
+Every todo belongs to a list, identified by a random UUID that the frontend
+generates. There are no accounts: knowing a list's ID is what gives access to it,
+so the ID works like a password. Lists don't need to be created — a list exists
+once it has a todo.
+
 ## Routes
 
-| Method | Path         | Body               | Notes                                  |
-|--------|--------------|--------------------|----------------------------------------|
-| GET    | /todos       | —                  | all todos, newest first                |
-| POST   | /todos       | `{ "text": "..." }`| 400 if text is empty or over 500 chars |
-| PATCH  | /todos/:id   | —                  | toggles `completed`, 404 if missing    |
-| DELETE | /todos/:id   | —                  | 204 on success, 404 if missing         |
-| GET    | /health      | —                  | liveness check                         |
+`:listId` must be a UUID (otherwise 400).
 
-Errors are always JSON: `{ "error": "..." }`.
+| Method | Path                       | Body                 | Notes                                   |
+|--------|----------------------------|----------------------|-----------------------------------------|
+| GET    | /lists/:listId/todos       | —                    | the list's todos, newest first          |
+| POST   | /lists/:listId/todos       | `{ "text": "..." }` | 400 if empty, over 500 chars, or list full (200) |
+| PATCH  | /lists/:listId/todos/:id   | —                    | toggles `completed`, 404 if missing     |
+| DELETE | /lists/:listId/todos/:id   | —                    | 204 on success, 404 if missing          |
+| GET    | /health                    | —                    | liveness check                          |
+
+Errors are always JSON: `{ "error": "..." }`. Each visitor (by IP) is limited to
+60 requests per minute.
 
 ## Structure
 
     src/
-      db.js            — Turso/libSQL client and the four todo queries
-      routes/todos.js  — the CRUD routes and input validation
-      server.js        — Express app, CORS, JSON 404 and error handlers
+      db.js            — Turso/libSQL client and the todo queries
+      routes/todos.js  — the CRUD routes, list ID check and input validation
+      server.js        — Express app, CORS, rate limit, JSON 404 and error handlers
 
 ## Deploy
 
