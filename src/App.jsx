@@ -1,8 +1,19 @@
+import { useState } from "react";
 import { useTodos } from "./useTodos.js";
+import { getInitialListId, saveListId } from "./listId.js";
 import { TodoForm } from "./components/TodoForm.jsx";
 import { TodoList } from "./components/TodoList.jsx";
+import { ListSync } from "./components/ListSync.jsx";
 
 function App() {
+    // useState runs getInitialListId only on the first render.
+    const [listId, setListId] = useState(getInitialListId);
+
+    const openList = (id) => {
+        saveListId(id);
+        setListId(id);
+    };
+
     const {
         todos,
         status,
@@ -13,7 +24,7 @@ function App() {
         toggleTodo,
         deleteTodo,
         dismissActionError
-    } = useTodos();
+    } = useTodos(listId);
 
     return (
         <div className="min-h-screen bg-slate-900 text-slate-100 px-4 py-10">
@@ -59,6 +70,8 @@ function App() {
                 {status === "ready" && (
                     <TodoList todos={todos} onToggle={toggleTodo} onDelete={deleteTodo} />
                 )}
+
+                <ListSync listId={listId} onOpenList={openList} />
             </div>
         </div>
     );

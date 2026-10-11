@@ -1,4 +1,4 @@
-import { useEffect, useReducer } from "react";
+import { useEffect, useReducer, useState } from "react";
 import { todosApi } from "./api.js";
 
 const initialState = {
@@ -55,29 +55,40 @@ export function todosReducer(state, action) {
     }
 }
 
-export function useTodos() {
+export function useTodos(listId) {
     const [state, dispatch] = useReducer(todosReducer, initialState);
+    // Bumping this number re-runs the effect below, which reloads the list.
+    const [reloadCount, setReloadCount] = useState(0);
 
-    async function load() {
-        dispatch({ type: "FETCH_START" });
-        try {
-            const todos = await todosApi.getAll();
-            dispatch({ type: "FETCH_SUCCESS", payload: todos });
-        } catch (err) {
-            dispatch({ type: "FETCH_ERROR", payload: err.message });
-        }
-    }
-
+    // Load the todos on startup, on retry, and whenever the user switches lists.
     useEffect(() => {
+        // If the list changes before this request finishes, its answer is for the
+        // old list and must be thrown away. React runs the returned cleanup
+        // function at that moment, which flips `ignore` to true.
+        let ignore = false;
+
+        async function load() {
+            dispatch({ type: "FETCH_START" });
+            try {
+                const todos = await todosApi.getAll(listId);
+                if (!ignore) dispatch({ type: "FETCH_SUCCESS", payload: todos });
+            } catch (err) {
+                if (!ignore) dispatch({ type: "FETCH_ERROR", payload: err.message });
+            }
+        }
+
         load();
-    }, []);
+        return () => {
+            ignore = true;
+        };
+    }, [listId, reloadCount]);
 
     // The actions below never throw: failures are shown via `actionError`.
     // addTodo returns true/false so the form knows whether to clear its input.
 
     async function addTodo(text) {
         try {
-            const created = await todosApi.create(text);
+            const created = await todosApi.create(listId, text);
             dispatch({ type: "ADD_TODO", payload: created });
             return true;
         } catch (err) {
@@ -88,7 +99,7 @@ export function useTodos() {
 
     async function toggleTodo(id) {
         try {
-            const updated = await todosApi.toggle(id);
+            const updated = await todosApi.toggle(listId, id);
             dispatch({ type: "TOGGLE_TODO", payload: updated });
         } catch (err) {
             dispatch({ type: "ACTION_ERROR", payload: err.message });
@@ -97,7 +108,7 @@ export function useTodos() {
 
     async function deleteTodo(id) {
         try {
-            await todosApi.remove(id);
+            await todosApi.remove(listId, id);
             dispatch({ type: "DELETE_TODO", payload: id });
         } catch (err) {
             dispatch({ type: "ACTION_ERROR", payload: err.message });
@@ -110,7 +121,7 @@ export function useTodos() {
 
     return {
         ...state,
-        reload: load,
+        reload: () => setReloadCount((count) => count + 1),
         addTodo,
         toggleTodo,
         deleteTodo,

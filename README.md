@@ -3,6 +3,11 @@
 React 19 + Vite + Tailwind v4 + vite-plugin-pwa. Installable, and the last-loaded
 list stays readable offline. Requires Node 22.12+.
 
+Each device starts with its own list. To use the same list on another device,
+open "Use on another device" at the bottom of the app and either open the link
+there or paste it into the box on the other device. Anyone with the link can edit
+the list — there are no accounts.
+
 ## Getting started
 
 Start the API first (see `todo-api`), then:
@@ -26,8 +31,9 @@ offline behavior against the built output.
 
     src/
       api.js         — fetch wrapper, one function per API endpoint
+      listId.js      — which list this device uses (from a link, saved, or new)
       useTodos.js    — state: a reducer plus the add/toggle/delete actions
-      components/    — TodoForm, TodoItem, TodoList
+      components/    — TodoForm, TodoItem, TodoList, ListSync (sharing panel)
       App.jsx        — page layout, loading and error states
     vite.config.js   — PWA manifest and offline caching of API responses
 

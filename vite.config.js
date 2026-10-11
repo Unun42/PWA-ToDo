@@ -30,7 +30,7 @@ export default defineConfig({
                     {
                         // This function is copied as source text into the generated
                         // service worker, so it can't use variables from this file.
-                        urlPattern: ({ url }) => url.pathname.startsWith("/todos"),
+                        urlPattern: ({ url }) => url.pathname.startsWith("/lists/"),
                         handler: "NetworkFirst",
                         options: {
                             cacheName: "api-cache",

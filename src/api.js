@@ -27,9 +27,14 @@ async function request(path, options = {}) {
 }
 
 export const todosApi = {
-    getAll: () => request("/todos"),
-    create: (text) =>
-        request("/todos", { method: "POST", body: JSON.stringify({ text }) }),
-    toggle: (id) => request(`/todos/${id}`, { method: "PATCH" }),
-    remove: (id) => request(`/todos/${id}`, { method: "DELETE" })
+    getAll: (listId) => request(`/lists/${listId}/todos`),
+    create: (listId, text) =>
+        request(`/lists/${listId}/todos`, {
+            method: "POST",
+            body: JSON.stringify({ text })
+        }),
+    toggle: (listId, id) =>
+        request(`/lists/${listId}/todos/${id}`, { method: "PATCH" }),
+    remove: (listId, id) =>
+        request(`/lists/${listId}/todos/${id}`, { method: "DELETE" })
 };
