@@ -65,7 +65,7 @@ render.yaml            Render deploy config for the API
 
 ## Run it locally
 
-You need [Node.js](https://nodejs.org) 22 or newer. No accounts are needed —
+You need [Node.js](https://nodejs.org) 24 (22.12+ also works). No accounts are needed —
 locally the API stores todos in a SQLite file.
 
 ```bash
