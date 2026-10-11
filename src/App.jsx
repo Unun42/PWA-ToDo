@@ -1,4 +1,4 @@
-import { useTodos } from "./hooks/useTodos.js";
+import { useTodos } from "./useTodos.js";
 import { TodoForm } from "./components/TodoForm.jsx";
 import { TodoList } from "./components/TodoList.jsx";
 
@@ -56,7 +56,7 @@ function App() {
                     </div>
                 )}
 
-                {status === "idle" && (
+                {status === "ready" && (
                     <TodoList todos={todos} onToggle={toggleTodo} onDelete={deleteTodo} />
                 )}
             </div>
