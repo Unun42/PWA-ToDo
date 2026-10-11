@@ -1,10 +1,11 @@
 services:
     - type: web
       name: todo-api
-      env: node
+      runtime: node
       plan: free
-      buildCommand: npm install
+      buildCommand: npm ci
       startCommand: npm start
+      healthCheckPath: /health
       envVars:
           - key: TURSO_DATABASE_URL
             sync: false

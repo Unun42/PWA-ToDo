@@ -3,19 +3,28 @@ import db from "../db/index.js";
 
 const router = Router();
 
+const MAX_TEXT_LENGTH = 500;
+
 router.get("/", async (req, res) => {
     const todos = await db.getAll();
     res.json(todos);
 });
 
 router.post("/", async (req, res) => {
-    const { text } = req.body;
+    // req.body is undefined in Express 5 when the request has no JSON body.
+    const text = typeof req.body?.text === "string" ? req.body.text.trim() : "";
 
-    if (typeof text !== "string" || text.trim().length === 0) {
+    if (text.length === 0) {
         return res.status(400).json({ error: "text is required" });
     }
 
-    const created = await db.insert(text.trim());
+    if (text.length > MAX_TEXT_LENGTH) {
+        return res
+            .status(400)
+            .json({ error: `text must be at most ${MAX_TEXT_LENGTH} characters` });
+    }
+
+    const created = await db.insert(text);
     res.status(201).json(created);
 });
 

@@ -1,7 +1,7 @@
 {
   "name": "todo-api",
   "version": "1.0.0",
-  "description": "",
+  "description": "REST API for the Todo PWA: Express 5 + SQLite locally, Turso (libSQL) in production",
   "main": "src/server.js",
   "type": "module",
   "scripts": {
@@ -20,5 +20,8 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.14"
+  },
+  "engines": {
+    "node": ">=22"
   }
 }
