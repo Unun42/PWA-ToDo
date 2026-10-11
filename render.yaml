@@ -2,6 +2,7 @@ services:
     - type: web
       name: todo-api
       runtime: node
+      rootDir: api
       plan: free
       buildCommand: npm ci
       startCommand: npm start

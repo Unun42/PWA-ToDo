@@ -1,6 +1,6 @@
 import { useState } from "react";
 
-// Mirrors MAX_TEXT_LENGTH in todo-api/src/routes/todos.js.
+// Mirrors MAX_TEXT_LENGTH in api/src/routes/todos.js.
 const MAX_TEXT_LENGTH = 500;
 
 export function TodoForm({ onAdd }) {

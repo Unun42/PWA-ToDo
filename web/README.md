@@ -10,7 +10,7 @@ the list — there are no accounts.
 
 ## Getting started
 
-Start the API first (see `todo-api`), then:
+Start the API first (see `../api`), then:
 
     npm install
     npm run dev
@@ -46,7 +46,7 @@ offline behavior against the built output.
 
 ## Deploy
 
-Deploy the backend (`todo-api`) first — see its README for the Turso + Render steps.
+Deploy the backend (`../api`) first — see its README for the Turso + Render steps.
 You'll need its URL here.
 
 1. Push this repo to GitHub
