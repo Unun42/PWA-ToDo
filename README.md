@@ -39,7 +39,17 @@ Errors are always JSON: `{ "error": "..." }`. Each visitor (by IP) is limited to
     src/
       db.js            — Turso/libSQL client and the todo queries
       routes/todos.js  — the CRUD routes, list ID check and input validation
-      server.js        — Express app, CORS, rate limit, JSON 404 and error handlers
+      app.js           — Express app, CORS, rate limit, JSON 404 and error handlers
+      server.js        — starts the app on PORT
+    test/
+      todos.test.js    — end-to-end tests of every route
+
+## Tests
+
+    npm test
+
+Uses Node's built-in test runner against a throwaway in-memory database, so no
+`.env` or Turso account is needed. GitHub Actions runs them on every push.
 
 ## Deploy
 
