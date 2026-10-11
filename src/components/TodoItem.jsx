@@ -5,6 +5,7 @@ export function TodoItem({ todo, onToggle, onDelete }) {
                 type="checkbox"
                 checked={Boolean(todo.completed)}
                 onChange={() => onToggle(todo.id)}
+                aria-label={`Mark "${todo.text}" as ${todo.completed ? "not done" : "done"}`}
                 className="h-4 w-4 accent-emerald-500"
             />
             <span

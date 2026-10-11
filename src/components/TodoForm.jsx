@@ -1,5 +1,8 @@
 import { useState } from "react";
 
+// Mirrors MAX_TEXT_LENGTH in todo-api/src/routes/todos.js.
+const MAX_TEXT_LENGTH = 500;
+
 export function TodoForm({ onAdd }) {
     const [text, setText] = useState("");
     const [submitting, setSubmitting] = useState(false);
@@ -10,12 +13,11 @@ export function TodoForm({ onAdd }) {
         if (!trimmed || submitting) return;
 
         setSubmitting(true);
-        try {
-            await onAdd(trimmed);
-            setText("");
-        } finally {
-            setSubmitting(false);
-        }
+        const added = await onAdd(trimmed);
+        setSubmitting(false);
+
+        // On failure, keep the text so the user can retry without retyping it.
+        if (added) setText("");
     };
 
     return (
@@ -25,6 +27,8 @@ export function TodoForm({ onAdd }) {
                 value={text}
                 onChange={(e) => setText(e.target.value)}
                 placeholder="Add a todo"
+                aria-label="New todo"
+                maxLength={MAX_TEXT_LENGTH}
                 className="flex-1 rounded-md bg-slate-800 border border-slate-700 px-3 py-2 text-sm text-slate-100 placeholder:text-slate-500 focus:outline-none focus:ring-2 focus:ring-emerald-500"
             />
             <button
@@ -32,7 +36,7 @@ export function TodoForm({ onAdd }) {
                 disabled={submitting || !text.trim()}
                 className="rounded-md bg-emerald-600 px-4 py-2 text-sm font-medium text-white disabled:opacity-40"
             >
-                Add
+                {submitting ? "Adding…" : "Add"}
             </button>
         </form>
     );

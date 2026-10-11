@@ -25,7 +25,7 @@ export default defineConfig(({ mode }) => {
             tailwindcss(),
             VitePWA({
                 registerType: "autoUpdate",
-                includeAssets: ["apple-touch-icon.png", "favicon.ico"],
+                includeAssets: ["apple-touch-icon.png"],
                 manifest: {
                     name: "Todo",
                     short_name: "Todo",
