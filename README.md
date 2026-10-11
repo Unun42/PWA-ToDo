@@ -19,6 +19,13 @@ The app talks to `http://localhost:3001` by default. To point it elsewhere, set
 `VITE_API_URL` (see `.env.example`) — in a `.env.local` file locally, or as an
 environment variable in your hosting dashboard for production builds.
 
+## Tests
+
+    npm test
+
+Runs the unit tests (`*.test.js` next to the code they test) with Vitest.
+GitHub Actions runs lint, tests and a production build on every push.
+
 ## Testing the PWA
 
     npm run build
