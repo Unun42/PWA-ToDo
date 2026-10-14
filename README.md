@@ -75,9 +75,8 @@ and [`web/`](web/README.md) have more detail on each half.
 
 ## How this was made
 
-I built the first version, then polished it with help from Claude Code: error
-handling, list sharing, tests, CI and these docs. The longer story, with the
-decisions and gotchas along the way, is in
+I built the first version, then polished it with help from Claude: error
+handling, list sharing, tests, CI and these docs. The longer story:
 [`docs/project-history.md`](docs/project-history.md).
 
 ## License
