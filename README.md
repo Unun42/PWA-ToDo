@@ -1,40 +1,50 @@
 # Todo PWA
 
-A small todo app I made to learn how a Progressive Web App, a REST API and free
-hosting fit together. I use it daily on my phone and computer, and I'm slowly
-shaping it into something I'm happy with.
+A basic todo app learning project, connecting: a Progressive Web App, a REST API and free
+hosting fit. Slowly polishing it into something useful.
 
-**[Try the demo →](https://unun-pwa.netlify.app/)** You'll get your own empty
-list, so click around as much as you like. (The backend sleeps when nobody's
-using it, so the first load can take a few seconds.)
+**[Try it yourself →](https://unun-pwa.netlify.app/)** 
+(The backend sleeps when nobody's using it, so first load can take a few seconds.)
 
 <img src="docs/screenshot.png" alt="The app showing a list of six todos, two of them completed" width="400">
 
 ## What it does
 
-- Add, tick off and delete todos. That's the whole feature list.
-- Install it to your home screen or desktop like a regular app.
+- Every user gets their own list.
 - Your last-loaded list stays readable offline.
-- Use the same list on several devices without making an account (see below).
+- Sync the same list on several devices without making an account (see below).
 
-## How lists work without accounts
+## How it works
 
-The first time you open the app, it makes up a long random ID for your list and
+- Install it to your home screen or desktop like a regular app.
+```
+ Browser / installed app               Render                     Turso
+┌───────────────────────┐  fetch  ┌────────────────┐  SQL    ┌──────────────┐
+│ web/  React PWA       │ ──────▶ │ api/  Express │ ──────▶ │ todos table  │
+│ service worker caches │ ◀────── │ REST API      │ ◀────── │              │
+│ the last list offline │  JSON   └────────────────┘         └──────────────┘
+└───────────────────────┘
+```
+
+## Lists: Private, and Synconizing lists 
+
+The first time you open the app, it creates a random ID for your list and
 saves it in the browser. Every request to the API includes that ID, and the API
-only returns todos with a matching ID. Nobody can guess the ID, so it works like
-a password: "Use on another device" in the app gives you a link containing it,
-and anyone with that link can use the list.
+only returns todos with a matching ID. That is also how every user gets their
+own list. "Use on another device" in the app gives you a link containing the ID, 
+enabling you to syncronize between devices.
+(Make sure to save your ID incase you're not OK with your list being lost!)
 
-That also means every demo visitor gets their own private list.
 
 ## What it's made of
 
-- **Frontend** (`web/`): React, Vite, Tailwind CSS and vite-plugin-pwa, hosted on Netlify
-- **Backend** (`api/`): Node.js and Express, hosted on Render
+- **Frontend**  (`web/`): React, Vite, Tailwind CSS and vite-plugin-pwa, hosted on Netlify
+- **Backend**   (`api/`): Node.js and Express, hosted on Render
 - **Database**: SQLite through [Turso](https://turso.tech)
-- **Tests**: Vitest and Node's built-in test runner, run by GitHub Actions on every push
+- **Tests**:    Vitest and Node's built-in test runner, run by GitHub Actions on push
 
 Everything runs on free tiers.
+
 
 ## Running it yourself
 
@@ -75,10 +85,9 @@ and [`web/`](web/README.md) have more detail on each half.
 
 ## How this was made
 
-I built the first version, then polished it with help from Claude: error
-handling, list sharing, tests, CI and these docs. The longer story:
-[`docs/project-history.md`](docs/project-history.md).
+Built the first version, polished it with Claude: error handling, list sharing, tests, CI, docs. 
+The longer story: [`docs/project-history.md`](docs/project-history.md).
 
 ## License
 
-[MIT](LICENSE): use anything here however you like.
+[MIT](LICENSE):  use anything here however you like, if you'd like.
